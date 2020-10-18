@@ -14,7 +14,6 @@ public class HotelReservation {
 	}
 
 	public static void addHotel(String hotelName, int weekEndRate, int weekDayRate) {
-		Customer regularCustomer = new Customer(weekDayRate, weekEndRate);
-		hotels.add(new Hotel(hotelName, regularCustomer));
+		hotels.add(new Hotel(hotelName, weekDayRate,weekEndRate));
 	}
 }

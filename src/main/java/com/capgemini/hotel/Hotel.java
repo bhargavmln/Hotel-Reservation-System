@@ -3,11 +3,14 @@ package com.capgemini.hotel;
 public class Hotel {
 
 	String hotelName;
-	Customer regularCustomer;
+	int regularWeekdayPrice;
+	int regularWeekendPrice;
 
-	public Hotel(String hotelName, Customer regularCustomer) {
+	public Hotel(String hotelName, int regularWeekdayPrice, int regularWeekendPrice) {
+		super();
 		this.hotelName = hotelName;
-		this.regularCustomer = regularCustomer;
+		this.regularWeekdayPrice = regularWeekdayPrice;
+		this.regularWeekendPrice = regularWeekendPrice;
 	}
 
 	public String getHotelName() {
@@ -18,8 +21,25 @@ public class Hotel {
 		this.hotelName = hotelName;
 	}
 
+	public int getRegularWeekdayPrice() {
+		return regularWeekdayPrice;
+	}
+
+	public void setRegularWeekdayPrice(int regularWeekdayPrice) {
+		this.regularWeekdayPrice = regularWeekdayPrice;
+	}
+
+	public int getRegularWeekendPrice() {
+		return regularWeekendPrice;
+	}
+
+	public void setRegularWeekendPrice(int regularWeekendPrice) {
+		this.regularWeekendPrice = regularWeekendPrice;
+	}
+
 	@Override
 	public String toString() {
-		return "Hotel Name: " + hotelName + "\nRegular Weekday Rate: " + regularCustomer.weekDayRate+ "\nRegular Weekend Rate: " + regularCustomer.weekEndRate + "\n";
+		return "Hotel Name: " + hotelName + "\nRegular Weekday Rate: " + regularWeekdayPrice
+				+ "\nRegular Weekend Rate: " + regularWeekendPrice + "\n";
 	}
 }
