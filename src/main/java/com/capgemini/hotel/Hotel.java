@@ -34,7 +34,7 @@ public class Hotel {
 	public void setPriceWeekend(int priceWeekend) {
 		this.priceWeekend = priceWeekend;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Hotel Name: " + name + " Weekday Price: " + priceWeekday + " WeekendPrice";

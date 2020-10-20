@@ -3,50 +3,92 @@ package com.capgemini.hotel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class HotelReservation {
-	private static Scanner sc = new Scanner(System.in);	
+	private static Scanner sc = new Scanner(System.in);
 	public ArrayList<Hotel> hotelList;
-	public Date checkin,checkout;
-	
+	public Date checkin, checkout;
+
 	public HotelReservation() {
 		hotelList = new ArrayList<Hotel>();
 	}
-	
-	public void addHotel(String name, int weekdayPrice, int weekendPrice){
-		Hotel hotel = new Hotel(name,weekdayPrice,weekendPrice);
+
+	public void addHotel(String name, int weekdayPrice, int weekendPrice) {
+		Hotel hotel = new Hotel(name, weekdayPrice, weekendPrice);
 		hotelList.add(hotel);
 	}
-	
-	public String findCheapestHotel() {
+
+	public int calcTotal(Hotel h) {
+		long difference = checkout.getTime() - checkin.getTime();
+		int numDays = (int) (difference / (1000 * 60 * 60 * 24)) + 1;
+		int priceWeekday = h.getPriceWeekday();
+		int priceWeekend = h.getPriceWeekend();
+		int numOfWorkdays = getNumOfWorkdays(checkin, checkout);
+		int totalAmt = (numOfWorkdays * priceWeekday + (numDays - numOfWorkdays) * priceWeekend);
+		return totalAmt;
+	}
+
+	public int getNumOfWorkdays(Date startDate, Date endDate) {
+		Calendar startCal = Calendar.getInstance();
+		startCal.setTime(startDate);
+
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTime(endDate);
+
+		int workDays = 0;
+		// Return 0 if start and end are the same
+		if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
+			return 0;
+		}
+
+		if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+			startCal.setTime(endDate);
+			endCal.setTime(startDate);
+		}
+
+		do {
+			// excluding start date
+			startCal.add(Calendar.DAY_OF_MONTH, 1);
+			if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY
+					&& startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+				++workDays;
+			}
+		} while (startCal.getTimeInMillis() < endCal.getTimeInMillis()); // excluding end date
+
+		return workDays;
+	}
+
+	public int findCheapestHotel() {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMMyyyy");
 		System.out.println("Check-In date(ddMMMyyyy),Check-Out date(ddMMMyyyy):");
 		String temp = sc.next();
-		String[] dates=temp.split(",");
+		String[] dates = temp.split(",");
 		try {
 			checkin = dateFormat.parse(dates[0]);
 			checkout = dateFormat.parse(dates[1]);
-		} 
-		catch (ParseException e) {
+		} catch (ParseException e) {
 			System.out.println("invalid checkin date");
 		}
-		long difference = checkout.getTime() - checkin.getTime();
-	    int numDays = (int) (difference / (1000*60*60*24))+1;
-		Hotel cheapestHotel=hotelList.get(0);
-		for(Hotel h:hotelList) {
-			if(h.getPriceWeekday()<cheapestHotel.getPriceWeekday()) {
-				cheapestHotel=h;
-			}
+		Map<String, Integer> hotelCost = new HashMap<String, Integer>();
+		for (Hotel h : hotelList) {
+			hotelCost.put(h.getName(), calcTotal(h));
 		}
-		int price=cheapestHotel.getPriceWeekday();
-		String hotelName=cheapestHotel.getName();
-		int totalAmt= (int)numDays*price;
-		System.out.println("Cheapest Hotel for the given dates is \n"+hotelName+", Total Rates: $"+totalAmt);
-		return hotelName;
+		int low = Collections.min(hotelCost.values());
+		System.out.println("Cheapest Hotel for the given dates is");
+		hotelCost.forEach((k, v) -> {
+			if (v == low) {
+				System.out.println(k + ", Total Rates: $" + v);
+			}
+		});
+		return low;
 	}
-	
+
 	public static void main(String[] args) {
 	}
 }
