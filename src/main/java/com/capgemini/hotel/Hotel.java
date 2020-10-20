@@ -4,11 +4,13 @@ public class Hotel {
 	private String name;
 	private int priceWeekday;
 	private int priceWeekend;
+	private int rating;
 
-	public Hotel(String name, int priceWeekday, int priceWeekend) {
+	public Hotel(String name, int priceWeekday, int priceWeekend, int rating) {
 		this.setName(name);
 		this.setPriceWeekday(priceWeekday);
 		this.setPriceWeekend(priceWeekend);
+		this.setRating(rating);
 	}
 
 	public String getName() {
@@ -33,6 +35,14 @@ public class Hotel {
 
 	public void setPriceWeekend(int priceWeekend) {
 		this.priceWeekend = priceWeekend;
+	}
+	
+	public int getRating() {
+		return rating;
+	}
+
+	public void setRating(int rating) {
+		this.rating = rating;
 	}
 
 	@Override
