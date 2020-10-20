@@ -135,10 +135,10 @@ public class HotelReservation {
 		return highestRatedMap;
 	}
 	
-
-	public void getPrices() {
+//To set prices for reward and regular customers
+	public void setPrices() {
 		System.out.println("Enter 1 for regular Customer \nEnter 2 for Reward Customer\n");
-		int choice=Integer.parseInt(sc.nextLine());
+		int choice=Integer.parseInt(sc.next());
 		if(choice==1) {
 			addHotel("Lakewood", 110, 90, 3);
 			addHotel("Bridgewood", 150, 50, 4);
