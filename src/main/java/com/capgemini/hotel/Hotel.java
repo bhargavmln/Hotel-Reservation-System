@@ -47,6 +47,6 @@ public class Hotel {
 
 	@Override
 	public String toString() {
-		return "Hotel Name: " + name + " Weekday Price: " + priceWeekday + " WeekendPrice";
+		return "Hotel Name: "+name+" Weekday Price: "+priceWeekday+ " WeekendPrice: "+priceWeekend+" Rating:"+rating;
 	}
 }
