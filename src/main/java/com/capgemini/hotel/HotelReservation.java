@@ -134,6 +134,22 @@ public class HotelReservation {
 		});
 		return highestRatedMap;
 	}
+	
+
+	public void getPrices() {
+		System.out.println("Enter 1 for regular Customer \nEnter 2 for Reward Customer\n");
+		int choice=Integer.parseInt(sc.nextLine());
+		if(choice==1) {
+			addHotel("Lakewood", 110, 90, 3);
+			addHotel("Bridgewood", 150, 50, 4);
+			addHotel("Ridgewood", 220, 150, 5);
+		}
+		if(choice==2) {
+			addHotel("Lakewood", 80, 80, 3);
+			addHotel("Bridgewood", 110, 50, 4);
+			addHotel("Ridgewood", 100, 40, 5);
+		}
+	}
 
 	public static void main(String[] args) {
 	}
