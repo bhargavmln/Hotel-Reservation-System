@@ -1,13 +1,14 @@
 package com.capgemini.hotel;
 
 public class Hotel {
-
 	private String name;
-	private int price;
+	private int priceWeekday;
+	private int priceWeekend;
 
-	public Hotel(String name, int price) {
+	public Hotel(String name, int priceWeekday, int priceWeekend) {
 		this.setName(name);
-		this.setPrice(price);
+		this.setPriceWeekday(priceWeekday);
+		this.setPriceWeekend(priceWeekend);
 	}
 
 	public String getName() {
@@ -18,16 +19,24 @@ public class Hotel {
 		this.name = name;
 	}
 
-	public int getPrice() {
-		return price;
+	public int getPriceWeekday() {
+		return priceWeekday;
 	}
 
-	public void setPrice(int price) {
-		this.price = price;
+	public void setPriceWeekday(int priceWeekday) {
+		this.priceWeekday = priceWeekday;
 	}
 
+	public int getPriceWeekend() {
+		return priceWeekend;
+	}
+
+	public void setPriceWeekend(int priceWeekend) {
+		this.priceWeekend = priceWeekend;
+	}
+	
 	@Override
 	public String toString() {
-		return "\n" + "Hotel Name: " + name + " Price: " + price + "\n";
+		return "Hotel Name: " + name + " Weekday Price: " + priceWeekday + " WeekendPrice";
 	}
 }

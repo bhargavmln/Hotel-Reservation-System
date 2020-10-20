@@ -2,22 +2,24 @@ package com.capgemini.hotel;
 
 import org.junit.Assert;
 import org.junit.Test;
-import java.util.ArrayList;
 
 public class HotelReservationTest {
 
 	@Test
-	public void givendetailsOf3Hotels_WhenAddedToHotelList_SizeOfListIs3() {
+	public void givendetailsOf3Hotels_WhenAddedToHotelList_SizeOfListIs3(){
 		HotelReservation temp = new HotelReservation();
-		Hotel lakeWood = new Hotel("Lakewood", 110);
-		Hotel bridgeWood = new Hotel("Bridgewood", 160);
-		Hotel ridgeWood = new Hotel("Ridgewood", 220);
-		ArrayList<Hotel> list = temp.getHotelList();
-		list.add(lakeWood);
-		list.add(bridgeWood);
-		list.add(ridgeWood);
-		Assert.assertEquals(3, list.size());
-
-		Assert.assertEquals("Lakewood", temp.findCheapestHotel());
+		temp.addHotel("Lakewood",110,90);
+		temp.addHotel("Bridgewood",160,50);
+		temp.addHotel("Ridgewood",220,150);
+		Assert.assertEquals(3, temp.hotelList.size());
+	}
+	
+	@Test
+	public void givendetailsOf3Hotels_WhenCorrect_ShouldReturnHotelNameWithLowRate() {
+		HotelReservation temp = new HotelReservation();
+		temp.addHotel("Lakewood",110,90);
+		temp.addHotel("Bridgewood",160,50);
+		temp.addHotel("Ridgewood",220,150);
+		Assert.assertEquals("Lakewood",temp.findCheapestHotel());
 	}
 }
