@@ -73,39 +73,66 @@ public class HotelReservation {
 			checkin = dateFormat.parse(dates[0]);
 			checkout = dateFormat.parse(dates[1]);
 		} catch (ParseException e) {
-			System.out.println("invalid check date format");
+			System.out.println("Invalid date format");
 		}
-		Map<Hotel,Integer> hotelCost=new HashMap<Hotel,Integer>();
-		Map<Hotel,Integer> cheapList=new HashMap<Hotel,Integer>();
-		for(Hotel h:hotelList) {
-			hotelCost.put(h,calcTotal(h));
+		Map<Hotel, Integer> hotelCost = new HashMap<Hotel, Integer>();
+		Map<Hotel, Integer> cheapList = new HashMap<Hotel, Integer>();
+		for (Hotel h : hotelList) {
+			hotelCost.put(h, calcTotal(h));
 		}
-		int low=Collections.min(hotelCost.values());
-		System.out.println("Cheapest Hotel for the given dates is");
-		hotelCost.forEach((k,v)->{
-			if(v==low) {
+		int low = Collections.min(hotelCost.values());
+		System.out.println("\nCheapest Hotel for the given dates is");
+		hotelCost.forEach((k, v) -> {
+			if (v == low) {
 				cheapList.put(k, v);
-				System.out.println(k.getName()+", Total Rates: $"+v);
+				System.out.println(k.getName() + ", Total Rate: $" + v);
 			}
 		});
 		return cheapList;
 	}
-	
+
 	public Hotel findCheapestBestRatedHotel() {
-		Map<Hotel,Integer>cheapList= findCheapestHotel();
-		ArrayList<Integer> ratingList=new ArrayList<Integer>();
-		ArrayList<Hotel> list=new ArrayList<Hotel>();
-		cheapList.forEach((k,v)->{
+		Map<Hotel, Integer> cheapList = findCheapestHotel();
+		ArrayList<Integer> ratingList = new ArrayList<Integer>();
+		ArrayList<Hotel> list = new ArrayList<Hotel>();
+		cheapList.forEach((k, v) -> {
 			ratingList.add(k.getRating());
 		});
-		int maxRating=Collections.max(ratingList);
-		cheapList.forEach((k,v)->{
-			if(k.getRating()==maxRating) {
+		int maxRating = Collections.max(ratingList);
+		cheapList.forEach((k, v) -> {
+			if (k.getRating() == maxRating) {
 				list.add(k);
-				System.out.println("Highest Rated Cheap Hotel is: \n"+ k.getName()+", Total Rates: $"+v);
+				System.out.println("\nHighest Rated Cheapest Hotel is: \n" + k.getName() + ", Total Rate: $" + v + "\n");
 			}
 		});
 		return list.get(0);
+	}
+
+	public Map<Hotel, Integer> findBestRatedHotel() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMMyyyy");
+		System.out.println("Check-In date(ddMMMyyyy),Check-Out date(ddMMMyyyy):");
+		String temp = sc.next();
+		String[] dates = temp.split(",");
+		try {
+			checkin = dateFormat.parse(dates[0]);
+			checkout = dateFormat.parse(dates[1]);
+		} catch (ParseException e) {
+			System.out.println("invalid check date format");
+		}
+		Map<Hotel, Integer> ratingList = new HashMap<Hotel, Integer>();
+		Map<Hotel, Integer> highestRatedMap = new HashMap<Hotel, Integer>();
+		for (Hotel h : hotelList) {
+			ratingList.put(h, h.getRating());
+		}
+		int maxRating = Collections.max(ratingList.values());
+		ratingList.forEach((k, v) -> {
+			if (v == maxRating) {
+				highestRatedMap.put(k, calcTotal(k));
+				System.out.println(
+						"\nHighest Rated Hotel is: \n" + k.getName() + ", Total Rate: $" + highestRatedMap.get(k));
+			}
+		});
+		return highestRatedMap;
 	}
 
 	public static void main(String[] args) {
