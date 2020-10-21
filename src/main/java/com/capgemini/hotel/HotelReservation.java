@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class HotelReservation {
 	private static Scanner sc = new Scanner(System.in);
@@ -19,79 +22,105 @@ public class HotelReservation {
 		hotelList = new ArrayList<Hotel>();
 	}
 
+	// To add hotel
 	public void addHotel(String name, int weekdayPrice, int weekendPrice, int rating) {
 		Hotel hotel = new Hotel(name, weekdayPrice, weekendPrice, rating);
 		hotelList.add(hotel);
 	}
 
+	// To set prices for reward and regular customers
+	public void setPrices() {
+		System.out.println("Enter 1 for regular Customer \nEnter 2 for Reward Customer\n");
+		int choice = Integer.parseInt(sc.next());
+		if (choice == 1) {
+			addHotel("Lakewood", 110, 90, 3);
+			addHotel("Bridgewood", 150, 50, 4);
+			addHotel("Ridgewood", 220, 150, 5);
+		}
+		if (choice == 2) {
+			addHotel("Lakewood", 80, 80, 3);
+			addHotel("Bridgewood", 110, 50, 4);
+			addHotel("Ridgewood", 100, 40, 5);
+		}
+	}
+
+	// To calculate total cost for given dates
 	public int calcTotal(Hotel h) {
 		long difference = checkout.getTime() - checkin.getTime();
 		int numDays = (int) (difference / (1000 * 60 * 60 * 24)) + 1;
 		int priceWeekday = h.getPriceWeekday();
 		int priceWeekend = h.getPriceWeekend();
-		int numOfWorkdays = getNumOfWorkdays(checkin, checkout);
-		int totalAmt = (numOfWorkdays * priceWeekday + (numDays - numOfWorkdays) * priceWeekend);
+		int numOfWeekends = getNumOfWeekends(checkin, checkout);
+		int totalAmt = (numOfWeekends * priceWeekend + (numDays - numOfWeekends) * priceWeekday);
 		return totalAmt;
 	}
 
-	public int getNumOfWorkdays(Date startDate, Date endDate) {
-		Calendar startCal = Calendar.getInstance();
-		startCal.setTime(startDate);
+	// To get the no of week days in the given days
 
-		Calendar endCal = Calendar.getInstance();
-		endCal.setTime(endDate);
-
-		int workDays = 0;
-		// Return 0 if start and end are the same
-		if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
-			return 0;
-		}
-
-		if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
-			startCal.setTime(endDate);
-			endCal.setTime(startDate);
-		}
-
-		do {
-			// excluding start date
-			startCal.add(Calendar.DAY_OF_MONTH, 1);
-			if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY
-					&& startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-				++workDays;
+	public int getNumOfWeekends(Date start, Date end) {
+		Calendar calStart = Calendar.getInstance();
+		calStart.setTime(start);
+		Calendar calEnd = Calendar.getInstance();
+		calEnd.setTime(end);
+		int numOfWeekend = 0;
+		String day = "";
+		String[] strDays = new String[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thusday", "Friday", "Saturday" };
+		while (calStart.before(calEnd) || calStart.equals(calEnd)) {
+			day = strDays[calStart.get(Calendar.DAY_OF_WEEK) - 1];
+			if (day.equals("Sunday") || day.equals("Saturday")) {
+				numOfWeekend++;
 			}
-		} while (startCal.getTimeInMillis() < endCal.getTimeInMillis()); // excluding end date
-
-		return workDays;
+			calStart.add(Calendar.DAY_OF_MONTH, 1);
+		}
+		return numOfWeekend;
 	}
 
-	public Map<Hotel, Integer> findCheapestHotel() {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMMyyyy");
-		System.out.println("Check-In date(ddMMMyyyy),Check-Out date(ddMMMyyyy):");
+	public void setDates() throws InvalidInputException {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMMyy");
+		System.out.println("Check-In date(ddMMMyy),Check-Out date(ddMMMyy):");
 		String temp = sc.next();
 		String[] dates = temp.split(",");
-		try {
-			checkin = dateFormat.parse(dates[0]);
-			checkout = dateFormat.parse(dates[1]);
-		} catch (ParseException e) {
-			System.out.println("Invalid date format");
+		Pattern pattern = Pattern.compile("[0-9]{2}[A-Z][a-z]{2}[0-9]{2}");
+		Matcher matcher1 = pattern.matcher(dates[0]);
+		Matcher matcher2 = pattern.matcher(dates[1]);
+		if (matcher1.matches()) {
+			try {
+				checkin = dateFormat.parse(dates[0]);
+			} catch (ParseException e) {
+				System.out.println("Cannot Parse Checkin Date");
+			}
+		} else {
+			throw new InvalidInputException("Invalid Checkin Date");
 		}
+		if (matcher2.matches()) {
+			try {
+				checkout = dateFormat.parse(dates[1]);
+			} catch (ParseException e) {
+				System.out.println("Cannot Parse Checkout Date");
+			}
+		} else {
+			throw new InvalidInputException("Invalid Checkout Date");
+		}
+	}
+
+	public Map<Hotel, Integer> findCheapestHotel() throws InvalidInputException {
+		setPrices();
+		setDates();
 		Map<Hotel, Integer> hotelCost = new HashMap<Hotel, Integer>();
 		Map<Hotel, Integer> cheapList = new HashMap<Hotel, Integer>();
-		for (Hotel h : hotelList) {
-			hotelCost.put(h, calcTotal(h));
-		}
+		hotelCost = hotelList.stream().collect(Collectors.toMap(h -> h, h -> calcTotal(h)));
 		int low = Collections.min(hotelCost.values());
-		System.out.println("\nCheapest Hotel for the given dates is");
+		System.out.println("Cheapest Hotel for the given dates is");
 		hotelCost.forEach((k, v) -> {
 			if (v == low) {
 				cheapList.put(k, v);
-				System.out.println(k.getName() + ", Total Rate: $" + v);
+				System.out.println(k.getName() + ", Total Rates: $" + v);
 			}
 		});
 		return cheapList;
 	}
 
-	public Hotel findCheapestBestRatedHotel() {
+	public ArrayList<Hotel> findCheapestBestRatedHotel() throws InvalidInputException {
 		Map<Hotel, Integer> cheapList = findCheapestHotel();
 		ArrayList<Integer> ratingList = new ArrayList<Integer>();
 		ArrayList<Hotel> list = new ArrayList<Hotel>();
@@ -102,55 +131,39 @@ public class HotelReservation {
 		cheapList.forEach((k, v) -> {
 			if (k.getRating() == maxRating) {
 				list.add(k);
-				System.out.println("\nHighest Rated Cheapest Hotel is: \n" + k.getName() + ", Total Rate: $" + v + "\n");
 			}
 		});
-		return list.get(0);
+		list.stream().forEach(k -> System.out
+				.println("Cheapest Best Rated Hotel is: \n" + k.getName() + ", Total Rates: $" + calcTotal(k)));
+		return list;
 	}
 
-	public Map<Hotel, Integer> findBestRatedHotel() {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMMyyyy");
-		System.out.println("Check-In date(ddMMMyyyy),Check-Out date(ddMMMyyyy):");
-		String temp = sc.next();
-		String[] dates = temp.split(",");
-		try {
-			checkin = dateFormat.parse(dates[0]);
-			checkout = dateFormat.parse(dates[1]);
-		} catch (ParseException e) {
-			System.out.println("invalid check date format");
-		}
-		Map<Hotel, Integer> ratingList = new HashMap<Hotel, Integer>();
+	public Map<Hotel, Integer> findBestRatedHotel() throws InvalidInputException {
+		setPrices();
+		System.out.println(hotelList);
+		setDates();
+		Map<Hotel, Integer> ratingMap = new HashMap<Hotel, Integer>();
 		Map<Hotel, Integer> highestRatedMap = new HashMap<Hotel, Integer>();
-		for (Hotel h : hotelList) {
-			ratingList.put(h, h.getRating());
-		}
-		int maxRating = Collections.max(ratingList.values());
-		ratingList.forEach((k, v) -> {
+		ratingMap = hotelList.stream().collect(Collectors.toMap(h -> h, h -> h.getRating()));
+		int maxRating = Collections.max(ratingMap.values());
+		ratingMap.forEach((k, v) -> {
 			if (v == maxRating) {
 				highestRatedMap.put(k, calcTotal(k));
-				System.out.println(
-						"\nHighest Rated Hotel is: \n" + k.getName() + ", Total Rate: $" + highestRatedMap.get(k));
 			}
 		});
+		highestRatedMap.entrySet().stream().forEach(k -> System.out
+				.println("Highest Rated Hotel is: \n" + k.getKey().getName() + ", Total Rates: $" + k.getValue()));
+
 		return highestRatedMap;
-	}
-	
-//To set prices for reward and regular customers
-	public void setPrices() {
-		System.out.println("Enter 1 for regular Customer \nEnter 2 for Reward Customer\n");
-		int choice=Integer.parseInt(sc.next());
-		if(choice==1) {
-			addHotel("Lakewood", 110, 90, 3);
-			addHotel("Bridgewood", 150, 50, 4);
-			addHotel("Ridgewood", 220, 150, 5);
-		}
-		if(choice==2) {
-			addHotel("Lakewood", 80, 80, 3);
-			addHotel("Bridgewood", 110, 50, 4);
-			addHotel("Ridgewood", 100, 40, 5);
-		}
 	}
 
 	public static void main(String[] args) {
+		HotelReservation temp = new HotelReservation();
+		try {
+			temp.findCheapestBestRatedHotel();
+		} catch (InvalidInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
